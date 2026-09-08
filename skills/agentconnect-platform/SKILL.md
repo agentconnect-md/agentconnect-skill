@@ -45,6 +45,16 @@ permissions, tools & skills, knowledge & memory — is in
 <https://docs.agentconnect.md/docs>. The platform itself is developed in the
 open-source AgentConnect monorepo (see the guide's final section).
 
+## Creating agents from templates
+
+When the user asks to **create a new agent** — "make me a code reviewer", "add an
+agent that reviews PRs", "set up an agent for X" — switch to the sibling
+`agentconnect-create-agent` skill. It runs a question-card (elicitation) flow that
+checks prerequisites (e.g. GitHub connected), collects daemon / runtime / model /
+name, creates the agent through the admin MCP tools, and ends with the agent's
+console URL and the console-only steps left to finish. The admin rules below apply
+there unchanged.
+
 ## Administering the platform
 
 When the user asks you to inspect or change platform state, pick the channel in this
