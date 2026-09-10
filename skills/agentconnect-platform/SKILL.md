@@ -49,10 +49,10 @@ open-source AgentConnect monorepo (see the guide's final section).
 
 When the user asks to **create a new agent** — "make me a code reviewer", "add an
 agent that reviews PRs", "set up an agent for X" — switch to the sibling
-`agentconnect-create-agent` skill. It runs a question-card (elicitation) flow that
-checks prerequisites (e.g. GitHub connected), collects daemon / runtime / model /
-name, creates the agent through the admin MCP tools, and ends with the agent's
-console URL and the console-only steps left to finish. The admin rules below apply
+`agentconnect-create-agent` skill. It runs a short question-card (elicitation) flow —
+one card for what only the user knows, one to confirm — checks prerequisites (e.g. the
+GitHub App installation), then creates the agent WITH its workspace and its triggers
+through the admin MCP tools and ends with the agent's console URL. The admin rules below apply
 there unchanged.
 
 ## Administering the platform
@@ -64,7 +64,8 @@ order:
 
 If your session has the AgentConnect admin MCP toolset — tool names like `whoami`,
 `listAgents`, `getAgent`, `listDaemons`, `listSessions`, `getUsage`,
-`listIntegrations`, `createAgent`, `updateAgent`, `upsertCron`, `setChannelTrigger` —
+`listIntegrations`, `createAgent`, `updateAgent`, `setAgentWorkspace`,
+`createGithubTrigger`, `upsertCron`, `setChannelTrigger` —
 use those tools. They carry the acting user's identity and permissions, are audited,
 and enforce the platform's confirmation gates for you.
 
