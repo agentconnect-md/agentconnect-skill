@@ -47,7 +47,7 @@ Look for the AgentConnect admin MCP toolset in your session — the server is na
 `agentconnect-admin`. The tools this skill uses: `whoami`, `listDaemons`,
 `listDaemonCapabilities`, `getDaemon`, `listAgents`, `listGithubInstallations`,
 `listGithubRepositories`, `createAgent`, `setAgentWorkspace`, `createGithubTrigger`,
-`listAgentHooks`, `listSessions`.
+`getOperation`, `listOperations`, `listAgentHooks`, `listSessions`.
 
 - **Present** → call `whoami` first (user, organization incl. its `slug`, role), then
   continue.
@@ -112,6 +112,23 @@ chat (slug taken → next slug; 403 → the credential cannot write, point at th
 3. Nothing else. Env vars, secrets, MCP servers, skills, memory and sharing have no
    tools — they are the only things that may appear as console follow-ups, and only
    when the template says the agent needs them.
+
+**Every one of those writes goes through the owner's approval.** In a webchat
+conversation a write does not execute in your own request: it answers
+`{status: 'awaiting_confirmation', operationId}`, and the person you are talking to
+approves it on a card above the composer. When that happens:
+
+- Say so in one line — which tool is waiting, and that you continue as soon as they
+  approve. Do NOT re-issue the write to check on it: a fresh call enqueues a SECOND
+  operation, which is how an org ends up with two agents.
+- The decision arrives in the conversation as an `[approval]` line naming the tool,
+  the operation and its state. Read the outcome with **`getOperation`** (or
+  `listOperations` to see what you are still blocked on) and continue from exactly
+  where you stopped — the remaining steps of this flow, then Step 5.
+- `completed` ⇒ carry on; `denied` ⇒ the user changed their mind, stop and ask what
+  they want instead; `failed` ⇒ report the error verbatim and fix what chat can fix;
+  `ambiguous` ⇒ do NOT retry blindly, read state first (`listAgents`,
+  `listAgentHooks`) and tell the user what you found.
 
 ### Step 5 — Show the result
 
