@@ -61,10 +61,52 @@ comment on the PR`.
 
 ### P2 — The caller may grant write on the repository
 
-The workspace write goes out under the _user's_ GitHub authority, so a caller who
-lacks write on the repository gets a 403 from `createAgent`. Report it as what it is
-— "your GitHub account needs write access to `<owner>/<repo>`" — rather than retrying
-at `read`, which would produce a reviewer that cannot review.
+The workspace write goes out under the **user's own** GitHub authority, not the App's,
+so a caller with only read on the repository gets
+
+```
+403 github: you do not have write access to <owner>/<repo> on GitHub (effective: read)
+```
+
+**from `createAgent` — after every question has been answered.** Check it before you
+ask anything else about this repository.
+
+**Check:** `getGithubRepositoryAccess` with the covering installation's `id` and the
+repository's `owner`/`repo`.
+
+- `canWrite: true` → proceed; `access: 'write'` and either review format is available.
+- `canWrite: false` (`permission: 'read'`) → **do not create with write**, and do not
+  leave the user at a dead end either. Missing access is a thing they can go fix, so
+  walk them to it and stay on the line. Say which of the two is missing before
+  listing steps — they have very different fixes:
+  1. **Their AgentConnect account may be linked to a different GitHub user.** The
+     permission above is read through the linked sign-in identity
+     (`identityRequired: true` means the deployment asserts one), so an unlinked or
+     wrong identity reads as read/none even for a repository they own. Point at the
+     console's GitHub identity link first — it is the fix that costs nothing.
+  2. **The GitHub account genuinely lacks Write on the repository.** If they
+     administer it: `https://github.com/<owner>/<repo>/settings/access` → Add people
+     / change role → **Write**. If they do not: name exactly what to ask an
+     owner/admin of `<owner>` for — Write on `<owner>/<repo>`, or membership of a
+     team that has it. Do not paraphrase this as "get access"; the ask has to be
+     copy-pasteable.
+  Then offer the choice in one card, with both options honest about what they cost:
+  - _I'll grant it now — wait for me_ → show the exact URL (a URL-mode card is made
+    for this), wait, then **re-run `getGithubRepositoryAccess` and continue this
+    same flow** from where it paused. Permission changes take effect immediately.
+    Never make the user start the flow over.
+  - _Create it as Brief with a read-only workspace_ → the agent clones read-only and
+    posts one summary comment; the platform posts it through the GitHub App, so
+    commenting needs no write from the user. Sets `access: 'read'` and
+    `reviewFormat: Brief`. Say plainly that this is not a dead end either:
+    `setAgentWorkspace` raises the same repository to `write` later, and the trigger
+    can then be switched to Details — so choosing this now costs nothing but the
+    inline comments and the Check until then.
+- `permission: 'none'` → same shape, starting from step 1: an identity that cannot
+  even READ the repository is far more often an unlinked identity than a private
+  repository. Guide, re-check, continue.
+- **404** → this deployment does not gate repository access per user; nothing to
+  check, carry on with `write`.
 
 ## Create
 

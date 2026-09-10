@@ -46,8 +46,9 @@ same one-card rule below.
 Look for the AgentConnect admin MCP toolset in your session — the server is named
 `agentconnect-admin`. The tools this skill uses: `whoami`, `listDaemons`,
 `listDaemonCapabilities`, `getDaemon`, `listAgents`, `listGithubInstallations`,
-`listGithubRepositories`, `createAgent`, `setAgentWorkspace`, `createGithubTrigger`,
-`getOperation`, `listOperations`, `listAgentHooks`, `listSessions`.
+`listGithubRepositories`, `getGithubRepositoryAccess`, `createAgent`,
+`setAgentWorkspace`, `createGithubTrigger`, `getOperation`, `listOperations`,
+`listAgentHooks`, `listSessions`.
 
 - **Present** → call `whoami` first (user, organization incl. its `slug`, role), then
   continue.
@@ -82,8 +83,25 @@ Never invent option lists, and never ask for something a read can answer:
 5. The template's own **Prerequisites** section (for code-reviewer: the GitHub App
    installation, read with `listGithubInstallations`).
 
-A prerequisite that is missing and cannot be fixed from chat ends the flow with clear
-console instructions — do not create a half-working agent and hope.
+Anything the template can check with a READ must be checked **before** the card, not
+discovered as a 403 after the user has answered every question.
+
+A missing prerequisite is not the end of the flow — it is a step in it. Almost all of
+them are things the user can go fix (a GitHub identity to link, a repository
+permission to be granted, an App installation to extend), so:
+
+1. Name which one is missing and what it blocks, in one sentence.
+2. Give the **exact** place to fix it — a URL, or the precise sentence to send whoever
+   can grant it. "Get access first" is not guidance.
+3. Offer to wait: a URL-mode card exists for this (see the elicitation reference).
+   When they come back, **re-run the same read and continue where you paused** —
+   never make them start over.
+4. Offer the reduced-but-working alternative when the template has one, and say what
+   it costs and how to lift it later.
+
+Only a prerequisite nobody in the conversation can fix — the deployment has no GitHub
+App at all — ends the flow, and then it names the operator task. Do not create a
+half-working agent and hope.
 
 ### Step 3 — One card, then one confirmation
 
