@@ -16,13 +16,13 @@ explanations, not for collecting values.
 
 ## What a card can hold
 
-| Field kind   | Renders as                           | Notes                                                              |
-| ------------ | ------------------------------------ | ------------------------------------------------------------------ |
-| `enum`       | single-choice options                | Give each option a short label; the value is what you get back.    |
-| `multi-enum` | checkboxes + confirm                 | Supports min/max item counts.                                      |
-| `boolean`    | two options (yes/no)                 | Use for confirmations such as "Create this agent?".                |
-| `text`       | free-text input                      | Can carry `minLength`/`maxLength`/`pattern`/format (email, uri…).  |
-| `number`     | numeric input                        | Optional integer flag and min/max.                                 |
+| Field kind   | Renders as            | Notes                                                             |
+| ------------ | --------------------- | ----------------------------------------------------------------- |
+| `enum`       | single-choice options | Give each option a short label; the value is what you get back.   |
+| `multi-enum` | checkboxes + confirm  | Supports min/max item counts.                                     |
+| `boolean`    | two options (yes/no)  | Use for confirmations such as "Create this agent?".               |
+| `text`       | free-text input       | Can carry `minLength`/`maxLength`/`pattern`/format (email, uri…). |
+| `number`     | numeric input         | Optional integer flag and min/max.                                |
 
 - **Defaults** are honored: the card pre-fills the control, the user may change it.
 - **Multi-field form**: one card can carry 2–**10** fields with one submit. Above
@@ -48,18 +48,24 @@ the flow needs an interactive chat (webchat or a chat platform) and stop.
 
 ## Rules of thumb for this skill
 
-1. **Read before you ask.** Option lists (daemons, runtimes, models, efforts,
-   permission modes, existing agent names) come from the admin tools, never from
-   memory. Stale or invented values fail at `createAgent`.
-2. **One topic per card.** Placement in one card, behavior in the next, identity in
-   the third, confirmation last. A user should be able to accept most cards as-is
-   thanks to good defaults.
-3. **Label with consequences.** "Permission mode: bypass (edits files without
+1. **A card you do not need is a card you do not raise.** Two cards is the budget for
+   a whole creation: one for what only the user knows, one boolean to confirm. Before
+   adding a field, ask which of these it is — a value a **read** already answers
+   (there is one online daemon; the runtime offers one model), a value the **template
+   fixes** (access tier, permission mode, output mode, slug, branch), or a real choice
+   only the user can make (which repository, which review format). Only the third kind
+   is a field; the first two are looked up and stated.
+2. **Read before you ask.** Option lists (daemons, runtimes, models, efforts,
+   permission modes, existing agent names, GitHub repositories) come from the admin
+   tools, never from memory. Stale or invented values fail at `createAgent`.
+3. **Every field carries a default**, so submitting the card untouched produces the
+   thing the user asked for.
+4. **Label with consequences.** "Permission mode: bypass (edits files without
    asking)" beats "bypass". Put the human name (`name`) and the runtime's own
    description in the label when the catalog provides them.
-4. **Confirm before writing.** Every create/update goes through a boolean card that
+5. **Confirm before writing.** Every create/update goes through a boolean card that
    restates what will be created. The confirmation is the user's decision, not a
    formality — respect a "no".
-5. **Never collect secrets** in a card or in chat: no tokens, no API keys, no
+6. **Never collect secrets** in a card or in chat: no tokens, no API keys, no
    passwords. Prerequisites that need a credential are done by the user in the
    console or on the provider's site; you only re-check afterwards.
