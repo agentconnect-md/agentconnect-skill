@@ -46,7 +46,7 @@ same one-card rule below.
 Look for the AgentConnect admin MCP toolset in your session — the server is named
 `agentconnect-admin`. The tools this skill uses: `whoami`, `listDaemons`,
 `listDaemonCapabilities`, `getDaemon`, `listAgents`, `listGithubInstallations`,
-`listGithubRepositories`, `getGithubRepositoryAccess`, `createAgent`,
+`getGithubApp`, `listGithubRepositories`, `getGithubRepositoryAccess`, `createAgent`,
 `setAgentWorkspace`, `createGithubTrigger`, `getOperation`, `listOperations`,
 `listAgentHooks`, `listSessions`.
 
@@ -81,7 +81,8 @@ Never invent option lists, and never ask for something a read can answer:
    is where the template's permission-mode rule resolves to a real value.
 4. `listAgents` — is the template's default slug taken?
 5. The template's own **Prerequisites** section (for code-reviewer: the GitHub App
-   installation, read with `listGithubInstallations`).
+   installation, read with `listGithubInstallations`; when nothing covers the
+   repository's owner, `getGithubApp` yields the install link to hand the user).
 
 Anything the template can check with a READ must be checked **before** the card, not
 discovered as a 403 after the user has answered every question.
