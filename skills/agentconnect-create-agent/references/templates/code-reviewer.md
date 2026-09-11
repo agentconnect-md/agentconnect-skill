@@ -45,15 +45,29 @@ comment on the PR`.
   (`GITHUB_APP_*` unset). That is an operator task: point at the self-host docs (the
   `agentconnect-setup` skill / <https://docs.agentconnect.md/docs> → deployment
   GitHub App) and stop. The template cannot work without it.
-- **Empty list** → the App exists but this org has installed it nowhere. Send the
-  user to the console: any agent → **Workspace** tab → **GitHub**
-  (`?tab=workspace&editws=github`) offers the one-shot, org-bound install link on
-  github.com. Ask them to come back, then re-read.
+- **Empty list, or no installation whose `accountLogin` is the repository's
+  owner** → the App exists but is not installed where this repository lives. Call
+  **`getGithubApp`** and hand the user its **`installUrl` verbatim** — that is the
+  install link, not a console page. Say what it is in one line: a link bound to this
+  organization, single-use, valid about 15 minutes; on GitHub they choose the account
+  (`<owner>`) and the repositories, and GitHub sends them back to the console once the
+  installation is claimed. Offer to wait (URL-mode card), then re-run
+  `listGithubInstallations` and continue where you paused. If the link expires or was
+  already used, call `getGithubApp` again for a fresh one — never reuse an old one.
+  - `getGithubApp` answering **403** → the caller can view but not connect: an
+    editor or owner of the org has to open the link. Say so and name the role.
+  - `getGithubApp` **absent** (older Control Plane) → fall back to the console: any
+    agent → **Workspace** tab → **GitHub** (`?tab=workspace&editws=github`) shows the
+    same install link.
+  - Never hand-build `https://github.com/apps/<slug>/installations/new` yourself —
+    without the signed `state` GitHub cannot bind the installation to this
+    organization and the setup callback rejects it.
 - **An installation whose `accountLogin` is the repository's owner** → satisfied.
   `repositorySelection: "selected"` means the repo must also appear in
   `listGithubRepositories` for that installation; if it does not, the user extends
-  the installation on github.com (Settings → Applications → the App → Repository
-  access) and re-syncs from the console's repository picker.
+  the installation on github.com (the installation's `settingsUrl` from
+  `listGithubInstallations` → Repository access) and re-syncs from the console's
+  repository picker.
 - **Details format additionally needs `pullRequestsPermission: "write"`** on that
   installation. When it reads `read` or `missing`, say so plainly: the installation
   must accept the App's current permissions (its `settingsUrl` is in the answer) or
@@ -90,7 +104,7 @@ repository's `owner`/`repo`.
      owner/admin of `<owner>` for — Write on `<owner>/<repo>`, or membership of a
      team that has it. Do not paraphrase this as "get access"; the ask has to be
      copy-pasteable.
-  Then offer the choice in one card, with both options honest about what they cost:
+     Then offer the choice in one card, with both options honest about what they cost:
   - _I'll grant it now — wait for me_ → show the exact URL (a URL-mode card is made
     for this), wait, then **re-run `getGithubRepositoryAccess` and continue this
     same flow** from where it paused. Permission changes take effect immediately.
