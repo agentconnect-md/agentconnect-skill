@@ -39,6 +39,26 @@ explanations, not for collecting values.
   page). Use it when a prerequisite requires the user to complete a flow in their
   browser: show the exact URL, wait for them to come back, then re-check.
 
+## Cards versus Console dialogs
+
+Two different things appear in the conversation and they are not interchangeable:
+
+- a **question card** is yours — you raise it, the user answers, the answer comes back
+  as typed data you act on;
+- a **Console dialog** is the platform's own form, opened by `manageCodeHosts`,
+  `configureIntegration`, `configureAgent`, `manageAgentTools`, `installSkill` or
+  `installMcpServer`. The user fills it in under their own Console session, and what
+  comes back is a short summary of what was saved.
+
+The dividing line is authority. Anything the platform must do under the user's own
+credentials — installing an App, connecting GitLab, a bot token, an app secret, an MCP
+header, an env var — is a dialog. Never raise a question card to collect one of those,
+and never turn a dialog's job into a series of questions. Conversely, do not open a
+dialog to ask something a card answers in one tap.
+
+One at a time, either way: a pending dialog is a pending question, and stacking a card
+on top of it is how a user ends up answering the wrong one.
+
 ## Where cards do not work
 
 Headless sessions — cron firings, inbound hooks (GitHub / webhook), dream and other
@@ -67,5 +87,5 @@ the flow needs an interactive chat (webchat or a chat platform) and stop.
    restates what will be created. The confirmation is the user's decision, not a
    formality — respect a "no".
 6. **Never collect secrets** in a card or in chat: no tokens, no API keys, no
-   passwords. Prerequisites that need a credential are done by the user in the
-   console or on the provider's site; you only re-check afterwards.
+   passwords. A prerequisite that needs a credential is a Console dialog you open
+   from here (above); you only re-read afterwards.
